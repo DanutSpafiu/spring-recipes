@@ -22,13 +22,18 @@ public class RecipeController {
     }
 
     @GetMapping("/{id}")
-    public Recipe getRecipeById(Long id) {
+    public Recipe getRecipeById(@PathVariable Long id) {
         return recipeService.getRecipeById(id);
     }
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Recipe addNewRecipe(@RequestBody Recipe recipe) {
         return recipeService.addNewRecipe(recipe);
+    }
+
+    @PostMapping("/users/{userId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Recipe addNewRecipe(@PathVariable Long userId, @RequestBody Recipe recipe) {
+        return recipeService.addNewRecipeByUser(userId, recipe);
     }
 }

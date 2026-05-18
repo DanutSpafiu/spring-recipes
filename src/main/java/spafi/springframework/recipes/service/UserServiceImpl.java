@@ -6,15 +6,15 @@ import spafi.springframework.recipes.model.Favorite;
 import spafi.springframework.recipes.model.Rating;
 import spafi.springframework.recipes.model.Recipe;
 import spafi.springframework.recipes.model.User;
-import spafi.springframework.recipes.repositories.FavoriteRepository;
-import spafi.springframework.recipes.repositories.RatingRepository;
-import spafi.springframework.recipes.repositories.RecipeRepository;
-import spafi.springframework.recipes.repositories.UserRepository;
+import spafi.springframework.recipes.repository.FavoriteRepository;
+import spafi.springframework.recipes.repository.RatingRepository;
+import spafi.springframework.recipes.repository.RecipeRepository;
+import spafi.springframework.recipes.repository.UserRepository;
 
 import java.util.List;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl {
 
     private final UserRepository userRepository;
     private final RecipeRepository recipeRepository;
@@ -31,24 +31,20 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    @Override
     public User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found: " + id));
     }
 
-    @Override
     public User addNewUser(User user) {
         return userRepository.save(user);
     }
 
     @Transactional
-    @Override
     public void addFavoriteRecipe(Long userId, Long recipeId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + userId));
@@ -64,7 +60,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    @Override
     public void rateRecipe(Long userId, Long recipeId, int rate) {
         if(rate < 1 || rate > 5) {
             throw new IllegalArgumentException("Invalid rating: " + rate);

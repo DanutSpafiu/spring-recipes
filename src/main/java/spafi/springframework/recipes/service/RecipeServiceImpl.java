@@ -1,15 +1,16 @@
 package spafi.springframework.recipes.service;
 
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import spafi.springframework.recipes.model.Recipe;
 import spafi.springframework.recipes.model.User;
-import spafi.springframework.recipes.repositories.RecipeRepository;
-import spafi.springframework.recipes.repositories.UserRepository;
+import spafi.springframework.recipes.repository.RecipeRepository;
+import spafi.springframework.recipes.repository.UserRepository;
 
 import java.util.List;
 
 @Service
-public class RecipeServiceImpl implements RecipeService {
+public class RecipeServiceImpl {
 
     private final RecipeRepository recipeRepository;
     private final UserRepository userRepository;
@@ -19,24 +20,20 @@ public class RecipeServiceImpl implements RecipeService {
         this.userRepository = userRepository;
     }
 
-    @Override
-    public List<Recipe> getAllRecipes() {
+    public List<Recipe> getAll() {
         return recipeRepository.findAll();
     }
 
-    @Override
-    public Recipe getRecipeById(Long id) {
+    public Recipe getById(Long id) throws ChangeSetPersister.NotFoundException {
         return recipeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Recipe not found: " + id));
+                .orElseThrow(() -> new ChangeSetPersister.NotFoundException());
     }
 
-    @Override
-    public Recipe addNewRecipe(Recipe recipe) {
+    public Recipe addNew(Recipe recipe) {
         return recipeRepository.save(recipe);
     }
 
-    @Override
-    public Recipe addNewRecipeByUser(Long userId, Recipe recipe) {
+    public Recipe addNewByUser(Long userId, Recipe recipe) {
         User owner = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + userId));
         recipe.setOwner(owner);

@@ -1,0 +1,82 @@
+package spafi.springframework.recipes.service;
+
+import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
+import spafi.springframework.recipes.model.Favorite;
+import spafi.springframework.recipes.model.Rating;
+import spafi.springframework.recipes.model.Recipe;
+import spafi.springframework.recipes.model.User;
+import spafi.springframework.recipes.repository.FavoriteRepository;
+import spafi.springframework.recipes.repository.RatingRepository;
+import spafi.springframework.recipes.repository.RecipeRepository;
+import spafi.springframework.recipes.repository.UserRepository;
+
+import java.util.List;
+
+@Service
+public class UserServiceImpl {
+
+    private final UserRepository userRepository;
+    private final RecipeRepository recipeRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final RatingRepository ratingRepository;
+    public UserServiceImpl(UserRepository userRepository,
+                           RecipeRepository recipeRepository,
+                           FavoriteRepository favoriteRepository,
+                           RatingRepository ratingRepository) {
+        this.userRepository = userRepository;
+        this.recipeRepository = recipeRepository;
+        this.favoriteRepository = favoriteRepository;
+        this.ratingRepository = ratingRepository;
+
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found: " + id));
+    }
+
+    public User addNewUser(User user) {
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public void addFavoriteRecipe(Long userId, Long recipeId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new RuntimeException("Recipe not found: " + recipeId));
+
+        Favorite favorite = new Favorite();
+        favorite.setUser(user);
+        favorite.setRecipe(recipe);
+
+        favoriteRepository.save(favorite);
+    }
+
+    @Transactional
+    public void rateRecipe(Long userId, Long recipeId, int rate) {
+        if(rate < 1 || rate > 5) {
+            throw new IllegalArgumentException("Invalid rating: " + rate);
+        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new RuntimeException("Recipe not found: " + recipeId));
+
+        Rating rating = ratingRepository.findByUserAndRecipe(user, recipe)
+                .orElseGet( () -> {
+                    Rating r = new Rating();
+                    r.setUser(user);
+                    r.setRecipe(recipe);
+                    return r;
+                });
+        rating.setScore((short) rate);
+        ratingRepository.save(rating);
+    }
+}

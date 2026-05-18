@@ -1,0 +1,36 @@
+package spafi.springframework.recipes.model;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.Instant;
+
+@Entity
+@Table(
+        name = "favorites",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "recipe_id"})
+)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Favorite {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "recipe_id", nullable = false)
+    private Recipe recipe;
+
+    @Column(name = "favorited_at", nullable = false, updatable = false)
+    private Instant favoritedAt = Instant.now();
+}

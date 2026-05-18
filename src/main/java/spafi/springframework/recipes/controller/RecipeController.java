@@ -33,7 +33,9 @@ public class RecipeController {
 
     @PostMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public Recipe addNewRecipe(@PathVariable Long userId, @RequestBody Recipe recipe) {
+    public Recipe addNewRecipeByUser(@PathVariable Long userId, @RequestBody Recipe recipe) {
         return recipeService.addNewRecipeByUser(userId, recipe);
     }
+
+
 }

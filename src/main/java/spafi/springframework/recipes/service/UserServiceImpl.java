@@ -11,6 +11,8 @@ import spafi.springframework.recipes.repositories.RatingRepository;
 import spafi.springframework.recipes.repositories.RecipeRepository;
 import spafi.springframework.recipes.repositories.UserRepository;
 
+import java.util.List;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -27,6 +29,22 @@ public class UserServiceImpl implements UserService {
         this.favoriteRepository = favoriteRepository;
         this.ratingRepository = ratingRepository;
 
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found: " + id));
+    }
+
+    @Override
+    public User addNewUser(User user) {
+        return userRepository.save(user);
     }
 
     @Transactional
